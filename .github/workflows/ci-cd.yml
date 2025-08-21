@@ -7,8 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: my-app
-  REPO_NAME: manasab805/my-app
+  IMAGE_NAME: my-app  # replace with your repo name
 
 jobs:
   build-and-scan:
@@ -35,15 +34,15 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:main
-            ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:sha-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository }}:main
+            ${{ env.REGISTRY }}/${{ github.repository }}:sha-${{ github.sha }}
 
       - name: Set up Trivy
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v1
 
       - name: Run Trivy Scan
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ env.REPO_NAME }}:sha-${{ github.sha }}
+          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ github.repository }}:sha-${{ github.sha }}
 
   update-deployment:
     name: Update Kubernetes Deployment
@@ -66,12 +65,12 @@ jobs:
 
       - name: Update deployment image
         run: |
-          NEW_IMAGE="${REGISTRY}/${REPO_NAME}:sha-${GITHUB_SHA}"
+          NEW_IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:sha-${GITHUB_SHA}"
           echo "Updating deployment to use image: $NEW_IMAGE"
           sed -i "s|image: ghcr.io/.*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
           grep -A 1 "image:" kubernetes/deployment.yaml
 
-      - name: Commit and push changes
+      - name: Commit and push deployment update
         run: |
           git add kubernetes/deployment.yaml
           git commit -m "Update deployment image to $NEW_IMAGE" || echo "No changes to commit"
