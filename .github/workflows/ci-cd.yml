@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: my-app   # must be lowercase
+  IMAGE_NAME: manasab805/my-app   # must be lowercase
 
 jobs:
   build-and-scan:
