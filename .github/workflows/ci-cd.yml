@@ -7,8 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: my-app   # must be lowercase
-  USERNAME: manasab805 # lowercase GitHub username
+  IMAGE_NAME: my-app
+  USERNAME: manasab805
 
 jobs:
   build-and-scan:
@@ -42,9 +42,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
 
       - name: Run Trivy Scan
-        run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL \
-          ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+        run: trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
 
   update-deployment:
     name: Update Kubernetes Deployment
