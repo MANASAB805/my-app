@@ -19,14 +19,11 @@ FROM gcr.io/distroless/python3:nonroot
 
 WORKDIR /app
 
-# Copy dependencies from build stage
-COPY --from=build /app/deps /app/
-
-# Copy app code
+# Copy dependencies and app code from build stage
 COPY --from=build /app /app
 
-# Expose port
+# Expose port (make sure app runs on this port)
 EXPOSE 8000
 
-# Run the app
+# Run the app using Distroless entrypoint
 CMD ["app.py"]
