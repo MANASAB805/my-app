@@ -6,7 +6,7 @@ WORKDIR /app
 # Upgrade pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
 
-# Copy requirements and install dependencies
+# Copy requirements and install dependencies into /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt -t .
 
@@ -14,10 +14,15 @@ RUN pip install --no-cache-dir -r requirements.txt -t .
 COPY . .
 
 # ---- Stage 2: Final ----
-FROM python:3.11-slim
+FROM gcr.io/distroless/python3:3.11
 
 WORKDIR /app
+
+# Copy app and all dependencies from build stage
 COPY --from=build /app /app
 
+# Expose your app port
 EXPOSE 5000
-CMD ["python", "app.py"]
+
+# Run your app
+CMD ["app.py"]
