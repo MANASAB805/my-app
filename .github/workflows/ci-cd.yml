@@ -7,7 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: manasab805/my-app   # must be lowercase
+  USERNAME: manasab805           # your GitHub username
+  IMAGE_NAME: my-app             # must be lowercase
 
 jobs:
   build-and-scan:
@@ -25,8 +26,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}  # or your PAT secret
 
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v5
@@ -34,15 +35,15 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:main
+            ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
 
       - name: Set up Trivy
         uses: aquasecurity/trivy-action@master
 
       - name: Run Trivy Scan
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
 
   update-deployment:
     name: Update Kubernetes Deployment
@@ -65,9 +66,9 @@ jobs:
 
       - name: Update Deployment Image
         run: |
-          NEW_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          NEW_IMAGE="${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
           echo "Updating deployment to use image: $NEW_IMAGE"
-          sed -i "s|image: ${REGISTRY}/.*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
+          sed -i "s|image: .*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
           grep -A 1 "image:" kubernetes/deployment.yaml
 
       - name: Commit and Push Deployment Update
