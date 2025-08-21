@@ -34,15 +34,15 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/manasab805/my-app:main
-            ghcr.io/manasab805/my-app:sha-${{ github.sha }}
+            ghcr.io/${{ github.actor }}/my-app:main
+            ghcr.io/${{ github.actor }}/my-app:sha-${{ github.sha }}
 
       - name: Set up Trivy
         uses: aquasecurity/trivy-action@master
 
       - name: Run Trivy Scan
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL ghcr.io/manasab805/my-app:sha-${{ github.sha }}
+          trivy image --exit-code 1 --severity HIGH,CRITICAL ghcr.io/${{ github.actor }}/my-app:sha-${{ github.sha }}
 
   update-deployment:
     name: Update Kubernetes Deployment
@@ -58,4 +58,20 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Sync with re
+      - name: Sync with remote main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Update Deployment Image
+        run: |
+          NEW_IMAGE="ghcr.io/${{ github.actor }}/my-app:sha-${{ github.sha }}"
+          echo "Updating deployment to use image: $NEW_IMAGE"
+          sed -i "s|image: .*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
+          grep -A 1 "image:" kubernetes/deployment.yaml
+
+      - name: Commit and Push Deployment Update
+        run: |
+          git add kubernetes/deployment.yaml
+          git commit -m "Update deployment image to $NEW_IMAGE" || echo "No changes to commit"
+          git push origin main
