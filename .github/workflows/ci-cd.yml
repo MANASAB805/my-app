@@ -34,8 +34,10 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/my-app:main
-            ${{ env.REGISTRY }}/${{ github.repository }}/my-app:sha-${{ github.sha }}
+            ghcr.io/manasab805/my-app:main
+            ghcr.io/manasab805/my-app:sha-${{ github.sha }}
+            - name: Build & Push Docker Image
+
 
       - name: Set up Trivy
         uses: aquasecurity/trivy-action@master
