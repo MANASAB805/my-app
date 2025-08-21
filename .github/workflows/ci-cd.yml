@@ -80,9 +80,12 @@ jobs:
           echo "Updating deployment to use image: $NEW_IMAGE"
           sed -i "s|image: .*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
           grep -A 1 "image:" kubernetes/deployment.yaml
-
+          
       - name: Commit and Push Deployment Update
+        env:
+          GH_PAT: ${{ secrets.GHCR_PAT }}
         run: |
           git add kubernetes/deployment.yaml
           git commit -m "Update deployment image to $NEW_IMAGE" || echo "No changes to commit"
-          git push origin main
+          git push https://$GH_PAT@github.com/${{ github.repository }}.git HEAD:main
+
