@@ -7,8 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  USERNAME: manasab805           # your GitHub username
-  IMAGE_NAME: my-app             # must be lowercase
+  IMAGE_NAME: my-app   # must be lowercase
 
 jobs:
   build-and-scan:
@@ -26,8 +25,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}  # or your PAT secret
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v5
@@ -35,15 +34,15 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:main
-            ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/my-app:main
+            ${{ env.REGISTRY }}/${{ github.repository }}/my-app:sha-${{ github.sha }}
 
       - name: Set up Trivy
         uses: aquasecurity/trivy-action@master
 
       - name: Run Trivy Scan
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ github.repository }}/my-app:sha-${{ github.sha }}
 
   update-deployment:
     name: Update Kubernetes Deployment
@@ -66,7 +65,7 @@ jobs:
 
       - name: Update Deployment Image
         run: |
-          NEW_IMAGE="${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}"
+          NEW_IMAGE="${{ env.REGISTRY }}/${{ github.repository }}/my-app:sha-${{ github.sha }}"
           echo "Updating deployment to use image: $NEW_IMAGE"
           sed -i "s|image: .*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
           grep -A 1 "image:" kubernetes/deployment.yaml
