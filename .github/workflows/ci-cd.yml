@@ -38,7 +38,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}:sha-${{ github.sha }}
 
       - name: Set up Trivy
-        uses: aquasecurity/trivy-action@v0.23.2
+        uses: aquasecurity/trivy-action@v0.31.0
 
       - name: Run Trivy Scan
         run: |
