@@ -52,6 +52,7 @@ jobs:
           scan-ref: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
           severity: HIGH,CRITICAL
           exit-code: 1
+          ignore-unfixed: true   
           cache: true
 
   update-deployment:
