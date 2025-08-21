@@ -84,10 +84,11 @@ jobs:
       - name: Commit and Push Deployment Update
         env:
           GH_PAT: ${{ secrets.GHCR_PAT }}
-          USERNAME: ${{ env.USERNAME }}
         run: |
+          git remote set-url origin https://$GH_PAT@github.com/${{ github.repository }}.git
           git add kubernetes/deployment.yaml
           git commit -m "Update deployment image to $NEW_IMAGE" || echo "No changes to commit"
-          git push https://$USERNAME:$GH_PAT@github.com/${{ github.repository }}.git HEAD:main
+          git push origin HEAD:main
+
 
 
