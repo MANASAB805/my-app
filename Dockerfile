@@ -4,7 +4,13 @@ FROM python:3.11-slim AS build
 # Set working directory
 WORKDIR /app
 
-# Copy requirements and install dependencies
+# Update OS packages and install dependencies
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install --no-install-recommends -y build-essential libffi-dev libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt -t .
@@ -13,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt -t .
 COPY . .
 
 # ---- Stage 2: Final ----
-FROM gcr.io/distroless/python3
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
@@ -25,4 +31,4 @@ COPY --from=build /app /app
 EXPOSE 5000
 
 # Command to run the Flask app
-CMD ["app.py"]
+CMD ["python", "app.py"]
