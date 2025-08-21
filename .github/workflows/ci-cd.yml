@@ -34,15 +34,15 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository | toLowerCase }}:main
-            ${{ env.REGISTRY }}/${{ github.repository | toLowerCase }}:sha-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository.toLowerCase() }}:main
+            ${{ env.REGISTRY }}/${{ github.repository.toLowerCase() }}:sha-${{ github.sha }}
 
       - name: Set up Trivy
         uses: aquasecurity/trivy-action@v0.23.2
 
       - name: Run Trivy Scan
         run: |
-          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ github.repository | toLowerCase }}:sha-${{ github.sha }}
+          trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ env.REGISTRY }}/${{ github.repository.toLowerCase() }}:sha-${{ github.sha }}
 
   update-deployment:
     name: Update Kubernetes Deployment
@@ -65,7 +65,7 @@ jobs:
 
       - name: Update Deployment Image
         run: |
-          NEW_IMAGE="${{ env.REGISTRY }}/${{ github.repository | toLowerCase }}:sha-${{ github.sha }}"
+          NEW_IMAGE="${{ env.REGISTRY }}/${{ github.repository.toLowerCase() }}:sha-${{ github.sha }}"
           echo "Updating deployment to use image: $NEW_IMAGE"
           sed -i "s|image: ${REGISTRY}/.*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
           grep -A 1 "image:" kubernetes/deployment.yaml
