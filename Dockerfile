@@ -3,7 +3,7 @@ FROM python:3.11-slim AS build
 
 WORKDIR /app
 
-# Upgrade pip, setuptools, and wheel to latest secure versions
+# Upgrade pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
 
 # Copy requirements and install dependencies to /app/deps
@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt -t /app/deps
 COPY . .
 
 # ---- Stage 2: Final ----
-# Use Distroless Python with non-root user for security
 FROM gcr.io/distroless/python3:nonroot
 
 WORKDIR /app
@@ -22,8 +21,7 @@ WORKDIR /app
 # Copy dependencies and app code from build stage
 COPY --from=build /app /app
 
-# Expose port (make sure app runs on this port)
 EXPOSE 8000
 
-# Run the app using Distroless entrypoint
-CMD ["app.py"]
+# Run the app using Distroless python3
+CMD ["/usr/bin/python3", "app.py"]
