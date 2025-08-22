@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: flask-app
-        image: ghcr.io/manasab805/my-app:sha-02f7c82de71bad91caf5397418073752b39dc7dd
+        image: ghcr.io/manasab805/my-app:sha-1fcea17540b2b6e4c407d67de33f0bad04fed61f
         # CI/CD pipeline will automatically replace <commit_sha> with latest commit SHA
         imagePullPolicy: Always
         ports:
