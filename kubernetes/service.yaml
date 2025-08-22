@@ -10,3 +10,4 @@ spec:
     - port: 8000        # port inside cluster
       targetPort: 8000  # container port
       nodePort: 30080   # port on your host machine
+      
