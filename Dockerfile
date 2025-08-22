@@ -6,7 +6,7 @@ WORKDIR /app
 # Upgrade pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
 
-# Copy requirements and install dependencies to /app/deps
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt -t /app/deps
 
@@ -18,10 +18,14 @@ FROM gcr.io/distroless/python3:nonroot
 
 WORKDIR /app
 
-# Copy dependencies and app code from build stage
+# Copy dependencies and app code
 COPY --from=build /app /app
 
+# Set Python path so Flask is found
+ENV PYTHONPATH="/app/deps"
+
+# Expose port
 EXPOSE 8000
 
-# Run the app using Distroless python3
-CMD ["/usr/bin/python3", "app.py"]
+# Run the app
+CMD ["app.py"]
