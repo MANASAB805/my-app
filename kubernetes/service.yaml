@@ -4,7 +4,7 @@ metadata:
   name: my-app
 spec:
   selector:
-    app: my-app
+    app: flask-app   # must match pod labels exactly
   type: ClusterIP
   ports:
     - port: 8000        # cluster port
