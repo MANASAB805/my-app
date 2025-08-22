@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt -t /app/deps
 COPY . .
 
 # ---- Stage 2: Final ----
+# ---- Stage 2: Final ----
 FROM gcr.io/distroless/python3:nonroot
 
 WORKDIR /app
@@ -24,8 +25,7 @@ COPY --from=build /app /app
 # Set Python path so Flask is found
 ENV PYTHONPATH="/app/deps"
 
-# Expose port
 EXPOSE 8000
 
-# Run the app
-CMD ["app.py"]
+# Correct way: run with python3
+CMD ["python3", "app.py"]
