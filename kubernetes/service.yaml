@@ -5,9 +5,7 @@ metadata:
 spec:
   selector:
     app: my-app
-  type: NodePort
+  type: ClusterIP
   ports:
-    - port: 8000        # port inside cluster
+    - port: 8000        # cluster port
       targetPort: 8000  # container port
-      nodePort: 30080   # port on your host machine
-      
