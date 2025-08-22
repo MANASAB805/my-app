@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt -t /app/deps
 COPY . .
 
 # ---- Stage 2: Final ----
-# ---- Stage 2: Final ----
 FROM gcr.io/distroless/python3:nonroot
 
 WORKDIR /app
@@ -27,5 +26,5 @@ ENV PYTHONPATH="/app/deps"
 
 EXPOSE 8000
 
-# Correct way: run with python3
-CMD ["python3", "app.py"]
+# Only run app (distroless already uses python3 as entrypoint)
+CMD ["app.py"]
